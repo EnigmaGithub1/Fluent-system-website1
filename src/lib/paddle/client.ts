@@ -30,7 +30,7 @@ function getEnv(): PaddleEnv {
  * (never self-hosted — required by Paddle for security/compliance).
  * Safe to call multiple times; subsequent calls reuse the same instance.
  */
-export function getPaddle(onCheckoutEvent?: (event: CheckoutEventsData) => void): Promise<Paddle | undefined> {
+export function getPaddle(onCheckoutEvent?: (event: any) => void): Promise<Paddle | undefined> {
   if (initPromise) return initPromise;
 
   const token = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN;
@@ -46,8 +46,8 @@ export function getPaddle(onCheckoutEvent?: (event: CheckoutEventsData) => void)
     environment: getEnv(),
     token,
     eventCallback: (event) => {
-      if (onCheckoutEvent) onCheckoutEvent(event as any);
-      handlePaddleEvent(event as any);
+      if (onCheckoutEvent) onCheckoutEvent(event);
+      handlePaddleEvent(event);
     },
   }).then((instance) => {
     paddleInstance = instance;
@@ -57,14 +57,14 @@ export function getPaddle(onCheckoutEvent?: (event: CheckoutEventsData) => void)
   return initPromise;
 }
 
-function handlePaddleEvent(event: CheckoutEventsData) {
+function handlePaddleEvent(event: any) {
   // Central place to react to Paddle's client-side checkout lifecycle.
   // IMPORTANT: these events are UX signals only. They must never be
   // treated as proof of payment — that authority lives exclusively in
   // the verified server-side webhook (see lib/paddle/webhook.ts).
-  switch ((event as any).name) {
+  switch (event.name) {
     case 'checkout.loaded':
-      trackEvent('checkout_started', { items: (event as any).data?.items });
+      trackEvent('checkout_started', { items: event.data?.items });
       break;
     case 'checkout.completed': {
       // Optimistic UX only. We navigate to /thank-you carrying the
@@ -73,9 +73,9 @@ function handlePaddleEvent(event: CheckoutEventsData) {
       // (We navigate manually here rather than relying on Paddle's
       // `successUrl` templating, so we control exactly which query
       // params land on the page regardless of overlay vs redirect mode.)
-      trackEvent('checkout_completed_client', { transactionId: (event as any).data?.transaction_id });
-      const txnId = (event as any).data?.transaction_id;
-      const productId = ((event as any).data?.custom_data as { internal_product_id?: string } | undefined)
+      trackEvent('checkout_completed_client', { transactionId: event.data?.transaction_id });
+      const txnId = event.data?.transaction_id;
+      const productId = (event.data?.custom_data as { internal_product_id?: string } | undefined)
         ?.internal_product_id;
       if (txnId && typeof window !== 'undefined') {
         const url = new URL('/thank-you', window.location.origin);
@@ -86,7 +86,7 @@ function handlePaddleEvent(event: CheckoutEventsData) {
       break;
     }
     case 'checkout.error':
-      trackEvent('checkout_error', { error: (event as any).data });
+      trackEvent('checkout_error', { error: event.data });
       break;
     default:
       break;
@@ -98,7 +98,7 @@ export interface OpenCheckoutOptions {
   email?: string;
   firstName?: string;
   lastName?: string;
-  onEvent?: ((event as any): CheckoutEventsData) => void;
+  onEvent?: (event: any) => void;
 }
 
 /**
