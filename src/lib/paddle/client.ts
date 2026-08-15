@@ -62,7 +62,7 @@ function handlePaddleEvent(event: CheckoutEventsData) {
   // IMPORTANT: these events are UX signals only. They must never be
   // treated as proof of payment — that authority lives exclusively in
   // the verified server-side webhook (see lib/paddle/webhook.ts).
-  switch (event.name) {
+  switch ((event as any).name) {
     case 'checkout.loaded':
       trackEvent('checkout_started', { items: event.data?.items });
       break;
