@@ -50,7 +50,7 @@ export const PRODUCTS: Record<InternalProductId, ProductConfig> = {
     tagline: 'The Social Fluency Training System',
     displayPrice: '$39.99',
     currency: 'USD',
-    paddlePriceId: process.env.NEXT_PUBLIC_PADDLE_FLUENT_PRICE_ID || console.log('MISSING: PADDLE_COMPLETE_PRICE_ID') || '',
+    paddlePriceId: process.env.NEXT_PUBLIC_PADDLE_COMPLETE_PRICE_ID || console.log('MISSING: PADDLE_COMPLETE_PRICE_ID') || '',
     // Buying Complete grants both — see instructions section 29.
     grants: ['fluent', 'fluent_complete'],
     downloadPackage: 'FLUENT_COMPLETE.zip',
