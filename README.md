@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # FLUENT Website
 
 Ecommerce website for **FLUENT** ($24.99) and **FLUENT COMPLETE** ($39.99) — two one-time-purchase
@@ -198,3 +199,6 @@ See `PRODUCTION_CHECKLIST.md` for the full list. At a glance, going live means:
 The ten test scenarios from the build spec (Paddle checkout success/failure, duplicate webhooks,
 access control, email delivery, mobile/desktop checkout, etc.) are listed in
 `PRODUCTION_CHECKLIST.md` under **Testing**, with notes on how to exercise each one in Sandbox.
+=======
+# Fluent-system-website1
+>>>>>>> 169dce51254ef3c58c7b638b9f2ce0f80957ba82
