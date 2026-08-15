@@ -64,7 +64,7 @@ function handlePaddleEvent(event: CheckoutEventsData) {
   // the verified server-side webhook (see lib/paddle/webhook.ts).
   switch ((event as any).name) {
     case 'checkout.loaded':
-      trackEvent('checkout_started', { items: event.data?.items });
+      trackEvent('checkout_started', { items: (event as any).data?.items });
       break;
     case 'checkout.completed': {
       // Optimistic UX only. We navigate to /thank-you carrying the
@@ -73,9 +73,9 @@ function handlePaddleEvent(event: CheckoutEventsData) {
       // (We navigate manually here rather than relying on Paddle's
       // `successUrl` templating, so we control exactly which query
       // params land on the page regardless of overlay vs redirect mode.)
-      trackEvent('checkout_completed_client', { transactionId: event.data?.transaction_id });
-      const txnId = event.data?.transaction_id;
-      const productId = (event.data?.custom_data as { internal_product_id?: string } | undefined)
+      trackEvent('checkout_completed_client', { transactionId: (event as any).data?.transaction_id });
+      const txnId = (event as any).data?.transaction_id;
+      const productId = ((event as any).data?.custom_data as { internal_product_id?: string } | undefined)
         ?.internal_product_id;
       if (txnId && typeof window !== 'undefined') {
         const url = new URL('/thank-you', window.location.origin);
@@ -86,7 +86,7 @@ function handlePaddleEvent(event: CheckoutEventsData) {
       break;
     }
     case 'checkout.error':
-      trackEvent('checkout_error', { error: event.data });
+      trackEvent('checkout_error', { error: (event as any).data });
       break;
     default:
       break;
@@ -98,7 +98,7 @@ export interface OpenCheckoutOptions {
   email?: string;
   firstName?: string;
   lastName?: string;
-  onEvent?: (event: CheckoutEventsData) => void;
+  onEvent?: ((event as any): CheckoutEventsData) => void;
 }
 
 /**
