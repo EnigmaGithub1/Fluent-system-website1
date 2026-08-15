@@ -1,0 +1,48 @@
+/* src/app/globals.css */
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Respect reduced-motion preferences (section 42) */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* Visible focus states everywhere (section 42) */
+  :focus-visible {
+    outline: 2px solid theme('colors.rust.DEFAULT');
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-md bg-rust px-7 py-4 text-base font-semibold text-paper transition hover:bg-rust-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rust min-h-[52px];
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-md border border-line bg-transparent px-7 py-4 text-base font-medium text-ink transition hover:bg-soft min-h-[52px];
+  }
+  .kicker {
+    @apply text-xs font-semibold uppercase tracking-[0.2em] text-rust;
+  }
+  .section-pad {
+    @apply px-5 py-16 sm:px-8 sm:py-24;
+  }
+}

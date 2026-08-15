@@ -1,0 +1,124 @@
+// FLUENT — Prisma schema
+//
+// Local development uses SQLite (zero setup). For production, switch the
+// datasource provider to "postgresql" (or "mysql") and point DATABASE_URL
+// at a real database — see PRODUCTION_CHECKLIST.md. The schema itself
+// does not need to change.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ------------------------------------------------------------
+// Customer
+// ------------------------------------------------------------
+// Deliberately minimal — see instructions section 28. We do not store
+// payment-card information; Paddle is the system of record for that.
+model Customer {
+  id              String   @id @default(cuid())
+  email           String   @unique
+  firstName       String?
+  lastName        String?
+  paddleCustomerId String? @unique
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  orders  Order[]
+  access  ProductAccess[]
+
+  @@index([email])
+}
+
+// ------------------------------------------------------------
+// Order
+// ------------------------------------------------------------
+// One row per Paddle transaction that reaches (or attempts to reach)
+// a completed state. Created/updated exclusively by the verified
+// webhook handler — never by the frontend success redirect alone.
+model Order {
+  id                  String   @id @default(cuid())
+  paddleTransactionId String   @unique
+  paddleCustomerId    String?
+  customerId          String
+  customerEmail       String
+  firstName           String?
+  lastName            String?
+
+  internalProductId String // "fluent" | "fluent_complete"
+  paddlePriceId     String
+  productName       String
+  amount            String // stored as string to avoid float rounding on money
+  currency          String
+
+  paymentStatus String // pending | paid | failed | refunded | canceled
+  createdAt     DateTime  @default(now())
+  completedAt   DateTime?
+
+  downloadAccessId String?
+  emailStatus       String    @default("not_sent") // not_sent | sent | failed
+  emailSentAt        DateTime?
+
+  customer Customer @relation(fields: [customerId], references: [id])
+
+  @@index([customerEmail])
+  @@index([paddleTransactionId])
+}
+
+// ------------------------------------------------------------
+// ProductAccess
+// ------------------------------------------------------------
+// The authoritative "what does this customer own" record. Kept
+// separate from Order so that an upgrade (FLUENT -> COMPLETE) is a
+// clean additive grant rather than a mutation of purchase history.
+model ProductAccess {
+  id               String   @id @default(cuid())
+  customerId       String
+  internalProductId String  // "fluent" | "fluent_complete"
+  grantedAt        DateTime @default(now())
+  grantedByOrderId String
+
+  customer Customer @relation(fields: [customerId], references: [id])
+
+  @@unique([customerId, internalProductId])
+  @@index([customerId])
+}
+
+// ------------------------------------------------------------
+// WebhookEvent
+// ------------------------------------------------------------
+// Idempotency ledger. Paddle may deliver the same event more than
+// once; every event id we've successfully processed is recorded here
+// so a duplicate delivery is a no-op instead of a duplicate order.
+model WebhookEvent {
+  id            String   @id // Paddle's event_id, used as-is
+  eventType     String
+  receivedAt    DateTime @default(now())
+  processedOk   Boolean  @default(false)
+  rawPayload    String // full JSON body, kept for audit/debugging
+
+  @@index([eventType])
+}
+
+// ------------------------------------------------------------
+// DownloadToken
+// ------------------------------------------------------------
+// Short-lived, single-purpose tokens backing /api/download/[token].
+// A signed JWT-style token is verified statelessly, but we also keep
+// a row here so tokens can be revoked/expired server-side if needed.
+model DownloadToken {
+  id           String   @id @default(cuid())
+  token        String   @unique
+  customerId   String
+  internalProductId String
+  expiresAt    DateTime
+  usedCount    Int      @default(0)
+  createdAt    DateTime @default(now())
+
+  @@index([token])
+  @@index([customerId])
+}
