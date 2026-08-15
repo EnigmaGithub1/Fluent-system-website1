@@ -46,7 +46,7 @@ export function getPaddle(onCheckoutEvent?: (event: CheckoutEventsData) => void)
     environment: getEnv(),
     token,
     eventCallback: (event) => {
-      if (onCheckoutEvent) onCheckoutEvent(event);
+      if (onCheckoutEvent) onCheckoutEvent(event as any);
       handlePaddleEvent(event);
     },
   }).then((instance) => {
