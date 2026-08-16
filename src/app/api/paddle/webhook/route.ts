@@ -141,8 +141,8 @@ async function fulfillOrder(event: PaddleWebhookEvent, txn: PaddleWebhookEvent['
 
   const customer = await upsertCustomer({
     email,
-    firstName: txn.customer_details?.first_name || txn.billing_details?.first_name,
-    lastName: txn.customer_details?.last_name || txn.billing_details?.last_name,
+    firstName: txn.customer_details?.first_name,
+    lastName: txn.customer_details?.last_name,
     paddleCustomerId: txn.customer_id,
   });
 
