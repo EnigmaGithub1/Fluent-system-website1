@@ -73,7 +73,12 @@ export default function UpsellCheckoutButton({
           </h2>
 
           <p className="text-sm sm:text-base text-ink/80 mb-4">
-            Get everything in FLUENT plus advanced training videos and personalized scenarios.
+            ✓Everything in FLUENT
+            ✓Full workbook (24 exercises)
+            ✓Social Fluency Diagnostic
+            ✓Failure-mode assessment
+            ✓30-Day training system + tracker
+            and much more
           </p>
 
           <div className="bg-amber-50 border border-amber-200 rounded p-4 mb-6">
