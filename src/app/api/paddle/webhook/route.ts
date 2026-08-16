@@ -2,6 +2,7 @@
 //
 // The authoritative fulfillment endpoint (master prompt sections 25-26)
 // with Paddle API integration to fetch customer email when not in webhook.
+// Supports both sandbox and production Paddle environments.
 //
 // Flow:
 //   1. Read the RAW request body (required for signature verification)
@@ -28,15 +29,20 @@ import { grantAccessForPurchase } from '@/lib/access';
 import { issueDownloadToken } from '@/lib/download';
 import { sendPurchaseConfirmation, tagCustomer } from '@/lib/email/service';
 
-// Fetch customer details from Paddle's API
+// Fetch customer details from Paddle's API (supports sandbox and production)
 async function getPaddleCustomer(customerId: string) {
   const apiKey = process.env.PADDLE_API_KEY;
   if (!apiKey) {
     throw new Error('PADDLE_API_KEY is not configured');
   }
 
+  const env = process.env.PADDLE_ENV || 'sandbox';
+  const apiUrl = env === 'production' 
+    ? `https://api.paddle.com/customers/${customerId}`
+    : `https://sandbox-api.paddle.com/customers/${customerId}`;
+
   try {
-    const response = await fetch(`https://api.paddle.com/customers/${customerId}`, {
+    const response = await fetch(apiUrl, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
