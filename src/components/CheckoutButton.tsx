@@ -1,9 +1,4 @@
 'use client';
-// src/components/CheckoutButton.tsx
-//
-// The one component that actually talks to Paddle. Every "Get FLUENT" /
-// "Get FLUENT COMPLETE" button on the site renders this, so there is
-// exactly one place checkout-opening logic lives.
 
 import { useState } from 'react';
 import { createCheckout, isPaddleConfigured } from '@/lib/paddle/client';
@@ -20,11 +15,19 @@ interface CheckoutButtonProps {
 export default function CheckoutButton({ productId, variant = 'primary', className = '', children }: CheckoutButtonProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [email, setEmail] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const product = getProduct(productId);
   const configured = isPaddleConfigured() && isProductConfigured(productId);
 
   async function handleClick() {
     setError(null);
+
+    if (!email) {
+      setError('Please enter your email');
+      return;
+    }
 
     if (!configured) {
       setError(
@@ -36,7 +39,12 @@ export default function CheckoutButton({ productId, variant = 'primary', classNa
     setLoading(true);
     trackEvent('product_view', { product: productId });
     try {
-      await createCheckout({ productId });
+      await createCheckout({ 
+        productId, 
+        email,
+        firstName: firstName || undefined,
+        lastName: lastName || undefined,
+      });
     } catch (err) {
       console.error(err);
       setError('Checkout could not open. Please try again in a moment.');
@@ -48,7 +56,31 @@ export default function CheckoutButton({ productId, variant = 'primary', classNa
   const base = variant === 'primary' ? 'btn-primary' : 'btn-secondary';
 
   return (
-    <div className="flex flex-col items-center gap-2">
+    <div className="flex flex-col items-center gap-2 w-full">
+      <input
+        type="email"
+        placeholder="Your email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        className="w-full sm:w-auto px-4 py-2 border border-ink/20 rounded"
+        disabled={loading}
+      />
+      <input
+        type="text"
+        placeholder="First name (optional)"
+        value={firstName}
+        onChange={(e) => setFirstName(e.target.value)}
+        className="w-full sm:w-auto px-4 py-2 border border-ink/20 rounded"
+        disabled={loading}
+      />
+      <input
+        type="text"
+        placeholder="Last name (optional)"
+        value={lastName}
+        onChange={(e) => setLastName(e.target.value)}
+        className="w-full sm:w-auto px-4 py-2 border border-ink/20 rounded"
+        disabled={loading}
+      />
       <button
         type="button"
         onClick={handleClick}
