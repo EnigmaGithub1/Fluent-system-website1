@@ -1,5 +1,6 @@
 // src/components/Hero.tsx
 import CheckoutButton from '@/components/CheckoutButton';
+import UpsellCheckoutButton from '@/components/UpsellCheckoutButton';
 
 export default function Hero() {
   return (
@@ -15,7 +16,7 @@ export default function Hero() {
         </p>
 
         <div className="mt-9 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
-          <CheckoutButton productId="fluent" />
+          <UpsellCheckoutButton productId="fluent" />
           <a
             href="#whats-inside"
             className="text-sm font-medium text-[#E8E1D3] underline decoration-[#D8A97F]/50 underline-offset-4 hover:text-paper"
