@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import CheckoutButton from '@/components/CheckoutButton';
+import { createCheckout, isPaddleConfigured } from '@/lib/paddle/client';
 import type { InternalProductId } from '@/lib/products';
-import { getProduct } from '@/lib/products';
+import { getProduct, isProductConfigured } from '@/lib/products';
+import { trackEvent } from '@/lib/analytics';
 
 interface UpsellCheckoutButtonProps {
   productId: InternalProductId;
@@ -21,13 +22,32 @@ export default function UpsellCheckoutButton({
   upsellTo = 'fluent_complete',
 }: UpsellCheckoutButtonProps) {
   const [showUpsell, setShowUpsell] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<InternalProductId>(productId);
+  const [loading, setLoading] = useState(false);
   const product = getProduct(productId);
   const upsellProduct = getProduct(upsellTo);
+  const configured = isPaddleConfigured() && isProductConfigured(productId);
 
-  const handleClick = () => {
+  const handleProceed = async (selectedProductId: InternalProductId) => {
+    setLoading(true);
+    trackEvent('product_view', { product: selectedProductId });
+    try {
+      await createCheckout({ productId: selectedProductId });
+    } catch (err) {
+      console.error(err);
+      alert('Checkout could not open. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleMainClick = () => {
+    if (!configured) {
+      alert(
+        `Checkout isn't connected yet — ${!isPaddleConfigured() ? 'Paddle client token' : 'this price ID'} is missing.`
+      );
+      return;
+    }
     setShowUpsell(true);
-    setSelectedProduct(productId);
   };
 
   if (showUpsell) {
@@ -40,74 +60,68 @@ export default function UpsellCheckoutButton({
         />
 
         {/* Modal */}
-        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-paper rounded-lg shadow-lg p-8 max-w-md z-50">
-          <h2 className="text-2xl font-serif text-ink mb-4">
-            Wait! Consider FLUENT COMPLETE
+        <div className="fixed inset-4 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:transform sm:-translate-x-1/2 sm:-translate-y-1/2 sm:max-w-md bg-paper rounded-lg shadow-xl p-6 sm:p-8 z-50 flex flex-col max-h-[90vh] overflow-y-auto">
+          <button
+            onClick={() => setShowUpsell(false)}
+            className="absolute top-4 right-4 text-ink/50 hover:text-ink text-xl"
+          >
+            ✕
+          </button>
+
+          <h2 className="text-xl sm:text-2xl font-serif text-ink mb-3 pr-6">
+            Upgrade to FLUENT COMPLETE?
           </h2>
 
-          <p className="text-ink/80 mb-6">
-            FLUENT COMPLETE includes everything in FLUENT plus advanced training methods and personalized scenarios.
+          <p className="text-sm sm:text-base text-ink/80 mb-4">
+            Get everything in FLUENT plus advanced training videos and personalized scenarios.
           </p>
 
           <div className="bg-amber-50 border border-amber-200 rounded p-4 mb-6">
-            <p className="text-sm text-ink/70">
-              <span className="font-semibold">FLUENT:</span> ${getProduct('fluent').displayPrice}
-            </p>
-            <p className="text-sm text-ink/70 mt-2">
-              <span className="font-semibold">FLUENT COMPLETE:</span> ${upsellProduct.displayPrice}
-            </p>
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sm font-semibold text-ink">FLUENT</span>
+              <span className="text-sm text-ink/70">{getProduct('fluent').displayPrice}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm font-semibold text-ink">FLUENT COMPLETE</span>
+              <span className="text-sm text-ink/70">{upsellProduct.displayPrice}</span>
+            </div>
           </div>
 
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-2 mt-auto">
             <button
-              onClick={() => {
-                setSelectedProduct(upsellTo);
-                setShowUpsell(false);
-              }}
-              className="btn-primary w-full"
+              onClick={() => handleProceed(upsellTo)}
+              disabled={loading}
+              className="btn-primary w-full py-3 disabled:opacity-70"
             >
-              Get FLUENT COMPLETE instead
+              {loading ? 'Opening checkout...' : 'Get FLUENT COMPLETE'}
             </button>
 
             <button
-              onClick={() => {
-                setSelectedProduct(productId);
-                setShowUpsell(false);
-              }}
-              className="btn-secondary w-full"
+              onClick={() => handleProceed(productId)}
+              disabled={loading}
+              className="btn-secondary w-full py-3 disabled:opacity-70"
             >
-              Proceed with {product.name}
+              {loading ? 'Opening checkout...' : `Proceed with ${product.name}`}
             </button>
 
             <button
               onClick={() => setShowUpsell(false)}
-              className="text-sm text-ink/60 hover:text-ink/80 py-2"
+              className="text-xs sm:text-sm text-ink/50 hover:text-ink/70 py-2"
             >
-              Close
+              Cancel
             </button>
           </div>
         </div>
-
-        {/* Hidden checkout button that triggers based on selection */}
-        <div className="hidden">
-          <CheckoutButton productId={selectedProduct} />
-        </div>
-
-        {/* Visible button that opens checkout when selection is made */}
-        {selectedProduct && selectedProduct !== productId && (
-          <CheckoutButton productId={selectedProduct} />
-        )}
-        {selectedProduct === productId && (
-          <CheckoutButton productId={productId} />
-        )}
       </>
     );
   }
 
+  const base = variant === 'primary' ? 'btn-primary' : 'btn-secondary';
+
   return (
     <button
-      onClick={handleClick}
-      className={`btn-${variant} ${className}`}
+      onClick={handleMainClick}
+      className={`${base} ${className}`}
     >
       {children || `Get ${product.name} — ${product.displayPrice}`}
     </button>
