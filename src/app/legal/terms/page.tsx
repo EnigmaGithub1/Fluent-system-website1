@@ -3,7 +3,7 @@ import LegalPageShell from '@/components/LegalPageShell';
 
 export default function TermsPage() {
   return (
-    <LegalPageShell title="Terms of Service" updated="[DATE — fill in before launch]">
+    <LegalPageShell title="Terms of Service" updated="August 16, 2026">
       
 
       <h2>What you're buying</h2>
@@ -46,7 +46,6 @@ export default function TermsPage() {
 
       <h2>Changes to these terms</h2>
       <p>If there are any changes to these terms that are important, you will be informed via email.</p>
-
       <h2>Contact</h2>
       <p>{process.env.SUPPORT_EMAIL || 'support@yourdomain.com'}</p>
     </LegalPageShell>
