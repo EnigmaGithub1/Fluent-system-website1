@@ -3,7 +3,7 @@ import LegalPageShell from '@/components/LegalPageShell';
 
 export default function RefundPage() {
   return (
-    <LegalPageShell title="Refund Policy" updated="[DATE — fill in before launch]">
+    <LegalPageShell title="Refund Policy" updated="August 16, 2026">
     
 
       <h2>Requesting a refund</h2>
