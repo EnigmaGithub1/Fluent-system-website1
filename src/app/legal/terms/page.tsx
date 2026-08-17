@@ -4,11 +4,7 @@ import LegalPageShell from '@/components/LegalPageShell';
 export default function TermsPage() {
   return (
     <LegalPageShell title="Terms of Service" updated="[DATE — fill in before launch]">
-      <p>
-        This template covers the basics for a one-time-purchase digital product business. Review
-        with a lawyer before launch — jurisdiction-specific consumer protection rules are not
-        addressed here.
-      </p>
+      
 
       <h2>What you're buying</h2>
       <p>
@@ -21,7 +17,6 @@ export default function TermsPage() {
       <p>
         Your purchase grants you a personal, non-transferable license to use the product for your
         own purposes. Redistribution, resale, or public sharing of the files is not permitted.
-        [Adjust to your actual licensing terms.]
       </p>
 
       <h2>Payment &amp; billing</h2>
@@ -34,8 +29,7 @@ export default function TermsPage() {
       <h2>Access</h2>
       <p>
         Upon successful payment, you receive permanent access to your purchased product via an
-        emailed download link and the /download page on this site. [Fill in any access-duration
-        caveats if you decide not to offer permanent access.]
+        emailed download link and the /download page on this site.
       </p>
 
       <h2>No guarantee of outcome</h2>
@@ -51,7 +45,7 @@ export default function TermsPage() {
       </p>
 
       <h2>Changes to these terms</h2>
-      <p>[Fill in how and when you'll notify customers of material changes.]</p>
+      <p>If there are any changes to these terms that are important, you will be informed via email.</p>
 
       <h2>Contact</h2>
       <p>{process.env.SUPPORT_EMAIL || 'support@yourdomain.com'}</p>
