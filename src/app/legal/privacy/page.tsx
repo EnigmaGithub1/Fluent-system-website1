@@ -3,7 +3,7 @@ import LegalPageShell from '@/components/LegalPageShell';
 
 export default function PrivacyPage() {
   return (
-    <LegalPageShell title="Privacy Policy" updated="[DATE — fill in before launch]">
+    <LegalPageShell title="Privacy Policy" updated="August 16, 2026">
 
       <h2>What we collect</h2>
       <p>
