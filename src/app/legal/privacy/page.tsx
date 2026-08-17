@@ -4,11 +4,6 @@ import LegalPageShell from '@/components/LegalPageShell';
 export default function PrivacyPage() {
   return (
     <LegalPageShell title="Privacy Policy" updated="[DATE — fill in before launch]">
-      <p>
-        This template describes, at a high level, what a digital-product business like FLUENT
-        typically needs to disclose. It does not constitute legal advice and must be reviewed
-        before use.
-      </p>
 
       <h2>What we collect</h2>
       <p>
@@ -35,8 +30,7 @@ export default function PrivacyPage() {
       </ul>
       <p>
         We do not use your email for marketing unless you separately and explicitly opt in
-        elsewhere. See master prompt section 36 in this project&apos;s source documentation for the
-        engineering decision behind this.
+        elsewhere.
       </p>
 
       <h2>Data retention</h2>
