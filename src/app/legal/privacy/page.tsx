@@ -35,15 +35,14 @@ export default function PrivacyPage() {
 
       <h2>Data retention</h2>
       <p>
-        [Fill in your actual retention policy — e.g. order records retained for accounting/legal
-        requirements, typically several years depending on your jurisdiction.]
+        Order records retained for accounting/legal
+        requirements, typically several years depending on your jurisdiction.
       </p>
 
       <h2>Your rights</h2>
       <p>
         Depending on your location, you may have rights to access, correct, or delete your personal
-        information. [Fill in the specific mechanism — e.g. an email address — and any
-        jurisdiction-specific rights such as GDPR or CCPA that apply to your business.]
+        information.
       </p>
 
       <h2>Contact</h2>
